@@ -29,3 +29,14 @@ export const deleteEntry = (id) => {
       url: `/api/entries/${id}`
   });
 };
+
+export const updateEntry = (entryId, data) => {
+  return $.ajax({
+    method: 'PATCH',
+    url: `api/entries/${entryId}`,
+    data,
+    processData: false,
+    contentType: false,
+    dataType: 'json',
+  });
+};

@@ -21,8 +21,7 @@ class Api::EntriesController < ApplicationController
 
   def update
     @entry = Entry.find(params[:id])
-
-    if @album.update(entry_params)
+    if @entry.update(entry_params)
       render "api/entries/show"
     else
       render json: @entry.errors.full_messages, status: 422

@@ -50,7 +50,7 @@ class Journal extends React.Component {
     entryForm.append("entry[body]", this.state.body);
 
     this.props.createEntry(entryForm).then(
-      this.setState({title: "", createForm: false})
+      this.setState({title: "", body: "", createForm: false})
     )
   }
 
@@ -63,7 +63,7 @@ class Journal extends React.Component {
               </span>
             </div>;
     }
-    
+
         return(
           <div className="entries-container">
             <div className={this.state.createForm ? "hidden" : "entry-header"}>

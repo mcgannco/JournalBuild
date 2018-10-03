@@ -50,3 +50,9 @@ export const createEntry = entry => dispatch => {
 export const deleteEntry = (entryId) => dispatch => {
   return APIUtil.deleteEntry(entryId).then(entry => dispatch(receiveDestroyedEntry(entry)));
 };
+
+export const updateEntry = (id,entry) => dispatch => {
+  return(
+    APIUtil.updateEntry(id,entry).then(entry => dispatch(receiveSingleEntry(entry)),
+  err => dispatch(receiveErrors(err.responseJSON))));
+};

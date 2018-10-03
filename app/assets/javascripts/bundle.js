@@ -90,7 +90,7 @@
 /*!*********************************************!*\
   !*** ./frontend/actions/journal_actions.js ***!
   \*********************************************/
-/*! exports provided: RECEIVE_ALL_ENTRIES, RECEIVE_SINGLE_ENTRY, RECEIVE_ERRORS, DESTROY_ENTRY, receiveAllEntries, receiveSingleEntry, receiveErrors, receiveDestroyedEntry, requestAllEntries, requestSingleEntry, createEntry, deleteEntry */
+/*! exports provided: RECEIVE_ALL_ENTRIES, RECEIVE_SINGLE_ENTRY, RECEIVE_ERRORS, DESTROY_ENTRY, receiveAllEntries, receiveSingleEntry, receiveErrors, receiveDestroyedEntry, requestAllEntries, requestSingleEntry, createEntry, deleteEntry, updateEntry */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -107,6 +107,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "requestSingleEntry", function() { return requestSingleEntry; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createEntry", function() { return createEntry; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deleteEntry", function() { return deleteEntry; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateEntry", function() { return updateEntry; });
 /* harmony import */ var _util_journal_api_util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/journal_api_util */ "./frontend/util/journal_api_util.js");
 
 var RECEIVE_ALL_ENTRIES = 'RECEIVE_ALL_ENTRIES ';
@@ -164,6 +165,15 @@ var deleteEntry = function deleteEntry(entryId) {
   return function (dispatch) {
     return _util_journal_api_util__WEBPACK_IMPORTED_MODULE_0__["deleteEntry"](entryId).then(function (entry) {
       return dispatch(receiveDestroyedEntry(entry));
+    });
+  };
+};
+var updateEntry = function updateEntry(id, entry) {
+  return function (dispatch) {
+    return _util_journal_api_util__WEBPACK_IMPORTED_MODULE_0__["updateEntry"](id, entry).then(function (entry) {
+      return dispatch(receiveSingleEntry(entry));
+    }, function (err) {
+      return dispatch(receiveErrors(err.responseJSON));
     });
   };
 };
@@ -261,8 +271,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _session_signup_form_container__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./session/signup_form_container */ "./frontend/components/session/signup_form_container.jsx");
 /* harmony import */ var _navbar_nav_bar_container__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./navbar/nav_bar_container */ "./frontend/components/navbar/nav_bar_container.js");
 /* harmony import */ var _journal_journal_container__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./journal/journal_container */ "./frontend/components/journal/journal_container.js");
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/es/index.js");
-/* harmony import */ var _util_route_util__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../util/route_util */ "./frontend/util/route_util.jsx");
+/* harmony import */ var _journal_entry_show_container__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./journal/entry_show_container */ "./frontend/components/journal/entry_show_container.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/es/index.js");
+/* harmony import */ var _util_route_util__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../util/route_util */ "./frontend/util/route_util.jsx");
+
 
 
 
@@ -274,15 +286,19 @@ __webpack_require__.r(__webpack_exports__);
 var App = function App() {
   return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
     id: "app"
-  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_navbar_nav_bar_container__WEBPACK_IMPORTED_MODULE_3__["default"], null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_5__["Switch"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_util_route_util__WEBPACK_IMPORTED_MODULE_6__["AuthRoute"], {
+  }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_navbar_nav_bar_container__WEBPACK_IMPORTED_MODULE_3__["default"], null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_6__["Switch"], null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_util_route_util__WEBPACK_IMPORTED_MODULE_7__["AuthRoute"], {
     exact: true,
     path: "/signin",
     component: _session_login_form_container__WEBPACK_IMPORTED_MODULE_1__["default"]
-  }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_util_route_util__WEBPACK_IMPORTED_MODULE_6__["AuthRoute"], {
+  }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_util_route_util__WEBPACK_IMPORTED_MODULE_7__["AuthRoute"], {
     exact: true,
     path: "/signup",
     component: _session_signup_form_container__WEBPACK_IMPORTED_MODULE_2__["default"]
-  }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_5__["Route"], {
+  }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_util_route_util__WEBPACK_IMPORTED_MODULE_7__["ProtectedRoute"], {
+    exact: true,
+    path: "/entry/:entryId",
+    component: _journal_entry_show_container__WEBPACK_IMPORTED_MODULE_5__["default"]
+  }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_6__["Route"], {
     path: "/",
     component: _journal_journal_container__WEBPACK_IMPORTED_MODULE_4__["default"]
   })));
@@ -365,6 +381,203 @@ function (_React$Component) {
 }(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
 
 /* harmony default export */ __webpack_exports__["default"] = (EntryItem);
+
+/***/ }),
+
+/***/ "./frontend/components/journal/entry_show.jsx":
+/*!****************************************************!*\
+  !*** ./frontend/components/journal/entry_show.jsx ***!
+  \****************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/es/index.js");
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+
+
+
+
+var EntryShow =
+/*#__PURE__*/
+function (_React$Component) {
+  _inherits(EntryShow, _React$Component);
+
+  function EntryShow(props) {
+    var _this;
+
+    _classCallCheck(this, EntryShow);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(EntryShow).call(this, props));
+    _this.state = {
+      updateForm: false,
+      title: "",
+      body: ""
+    };
+    _this.openUpdateForm = _this.openUpdateForm.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.updateEntry = _this.updateEntry.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.updateTitle = _this.updateTitle.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    _this.updateBody = _this.updateBody.bind(_assertThisInitialized(_assertThisInitialized(_this)));
+    return _this;
+  }
+
+  _createClass(EntryShow, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.props.requestSingleEntry(this.props.match.params.entryId);
+    }
+  }, {
+    key: "componentWillReceiveProps",
+    value: function componentWillReceiveProps(nextProps) {
+      if (this.props.match.params.entryId !== nextProps.match.params.entryId) {
+        this.props.requestSingleEntry(nextProps.match.params.entryId);
+      }
+    }
+  }, {
+    key: "openUpdateForm",
+    value: function openUpdateForm(e) {
+      this.setState({
+        updateForm: true,
+        title: this.props.entry.title,
+        body: this.props.entry.body
+      });
+    }
+  }, {
+    key: "updateEntry",
+    value: function updateEntry() {
+      var entryForm = new FormData();
+      entryForm.append("entry[title]", this.state.title);
+      entryForm.append("entry[body]", this.state.body);
+      entryForm.append("entry[user_id]", this.props.entry.user_id);
+      this.props.updateEntry(this.props.entry.id, entryForm).then(this.setState({
+        updateForm: false,
+        title: "",
+        body: ""
+      }));
+    }
+  }, {
+    key: "updateTitle",
+    value: function updateTitle(e) {
+      this.setState({
+        title: e.currentTarget.value
+      });
+    }
+  }, {
+    key: "updateBody",
+    value: function updateBody(e) {
+      this.setState({
+        body: e.currentTarget.value
+      });
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this$props = this.props,
+          entry = _this$props.entry,
+          currentUser = _this$props.currentUser;
+
+      if (!entry || !currentUser) {
+        return null;
+      } else if (entry && currentUser) {
+        if (currentUser != entry.user_id) {
+          return null;
+        } else {
+          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+            className: "entry-show-container"
+          }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+            className: "entry-show-options"
+          }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+            className: this.state.updateForm ? "hidden" : "",
+            onClick: this.openUpdateForm
+          }, "Update"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", {
+            className: this.state.updateForm ? "" : "hidden",
+            onClick: this.updateEntry
+          }, "Save"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(react_router_dom__WEBPACK_IMPORTED_MODULE_1__["Link"], {
+            to: "/"
+          }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, "All Entries"))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+            className: "entry-show-title"
+          }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+            className: this.state.updateForm ? "hidden" : ""
+          }, entry.title), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("input", {
+            onChange: this.updateTitle,
+            className: this.state.updateForm ? "new-title" : "hidden",
+            value: this.state.title
+          }))), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
+            className: "entry-show-body"
+          }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("p", {
+            className: this.state.updateForm ? "hidden" : ""
+          }, entry.body), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("textarea", {
+            onChange: this.updateBody,
+            className: this.state.updateForm ? "new-body" : "hidden",
+            value: this.state.body
+          }, this.state.body)));
+        }
+      }
+    }
+  }]);
+
+  return EntryShow;
+}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
+
+/* harmony default export */ __webpack_exports__["default"] = (EntryShow);
+
+/***/ }),
+
+/***/ "./frontend/components/journal/entry_show_container.js":
+/*!*************************************************************!*\
+  !*** ./frontend/components/journal/entry_show_container.js ***!
+  \*************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+/* harmony import */ var _actions_journal_actions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../actions/journal_actions */ "./frontend/actions/journal_actions.js");
+/* harmony import */ var _entry_show__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./entry_show */ "./frontend/components/journal/entry_show.jsx");
+
+
+
+
+var msp = function msp(state, ownProps) {
+  return {
+    currentUser: state.session.id,
+    entry: state.entities.entries[ownProps.match.params.entryId]
+  };
+};
+
+var mdp = function mdp(dispatch) {
+  return {
+    requestSingleEntry: function requestSingleEntry(id) {
+      return dispatch(Object(_actions_journal_actions__WEBPACK_IMPORTED_MODULE_1__["requestSingleEntry"])(id));
+    },
+    updateEntry: function updateEntry(id, entry) {
+      return dispatch(Object(_actions_journal_actions__WEBPACK_IMPORTED_MODULE_1__["updateEntry"])(id, entry));
+    }
+  };
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (Object(react_redux__WEBPACK_IMPORTED_MODULE_0__["connect"])(msp, mdp)(_entry_show__WEBPACK_IMPORTED_MODULE_2__["default"]));
 
 /***/ }),
 
@@ -468,6 +681,7 @@ function (_React$Component) {
       entryForm.append("entry[body]", this.state.body);
       this.props.createEntry(entryForm).then(this.setState({
         title: "",
+        body: "",
         createForm: false
       }));
     }
@@ -1325,7 +1539,7 @@ var configureStore = function configureStore() {
 /*!*******************************************!*\
   !*** ./frontend/util/journal_api_util.js ***!
   \*******************************************/
-/*! exports provided: fetchAllEntries, fetchSingleEntry, createEntry, deleteEntry */
+/*! exports provided: fetchAllEntries, fetchSingleEntry, createEntry, deleteEntry, updateEntry */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1334,6 +1548,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetchSingleEntry", function() { return fetchSingleEntry; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createEntry", function() { return createEntry; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deleteEntry", function() { return deleteEntry; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateEntry", function() { return updateEntry; });
 var fetchAllEntries = function fetchAllEntries() {
   return $.ajax({
     method: 'GET',
@@ -1360,6 +1575,16 @@ var deleteEntry = function deleteEntry(id) {
   return $.ajax({
     method: 'delete',
     url: "/api/entries/".concat(id)
+  });
+};
+var updateEntry = function updateEntry(entryId, data) {
+  return $.ajax({
+    method: 'PATCH',
+    url: "api/entries/".concat(entryId),
+    data: data,
+    processData: false,
+    contentType: false,
+    dataType: 'json'
   });
 };
 

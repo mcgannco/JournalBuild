@@ -126,3 +126,55 @@
   resize: none;
   color: white;
 }
+
+.entry-show-container {
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2%;
+}
+
+.entry-show-title {
+  padding: 5px;
+  color:black;
+  font-weight: bold;
+}
+
+.entry-show-title p {
+  border-bottom: 2px solid black;
+}
+
+.entry-show-body {
+  padding: 5px;
+  color:#B22222;
+}
+
+.entry-show-options {
+  display: flex;
+  width: 95%;
+  justify-content: flex-end;
+  color: grey;
+  font-weight: bold;
+}
+
+.entry-show-options span {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.new-title {
+  border: 1px solid #B22222;
+  padding-left: 4px;
+  color: black;
+}
+
+.new-body {
+  border: 1px solid #B22222;
+  min-height: 100px;
+  width: 66rem;
+  padding: 5px 5px;
+  resize: none;
+
+}
